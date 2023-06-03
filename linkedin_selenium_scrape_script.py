@@ -11,7 +11,7 @@ class Scrape:
     def __init__(self):
         self.base_url = "https://www.linkedin.com"
         self._instance_url()
-        time.sleep(10)
+        time.sleep(2)
         self.actions
         self.exec_script()
 
@@ -49,7 +49,7 @@ class Scrape:
     
     def exec_script(self):
         self._get_elements_and_click('/html/body/nav/ul/li[4]/a')
-        time.sleep(8)
+        time.sleep(2)
         self._get_elements_and_fill('//*[@id="job-search-bar-keywords"]','Django')
         self._get_elements_and_click('//*[@id="jobs-search-panel"]/form/section[2]/button')
         self._get_elements_and_fill('//*[@id="job-search-bar-location"]', 'indonesia')
@@ -57,7 +57,7 @@ class Scrape:
         for i in range(1, 5):
             title = self._extract_title(f'//*[@id="main-content"]/section[2]/ul/li[{i}]/div/a/span')
             print(title)
-        time.sleep(20)
+        time.sleep(2)
 
 if __name__ == "__main__":
     Scrape()
