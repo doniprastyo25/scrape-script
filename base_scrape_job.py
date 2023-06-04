@@ -76,5 +76,5 @@ class BaseScrape(ABC):
             "job": clean_title,
             "link": link
         }
-        job.update(additional_info)
+        job["additional info"] = additional_info
         return job
