@@ -26,47 +26,51 @@ class BaseScrape(ABC):
             raise Exception("self._platform and self._platform_base_link should be fill")
         self._instance_url(self._base_url)
         
-    def _instance_url(self, url, return_result=False):
-        response = requests.get(url)
-        soup = BeautifulSoup(response.content, 'html.parser')
+    def _instance_url(self, url: str, return_result: bool=False) -> BeautifulSoup:
+        response: requests.models.Response = requests.get(url)
+        soup: BeautifulSoup = BeautifulSoup(response.content, 'html.parser')
         if return_result:
             return soup
-        self.soup = soup
+        self.soup: str = soup
     
-    def _extract_link(self, xpath_link):
-        link_elements = self.soup.select_one(xpath_link)
-        link = link_elements['href']
+    def _extract_link(self, xpath_link: str) -> str:
+        link_elements: bs4.element.Tag = self.soup.select_one(xpath_link)
+        link: str = link_elements['href']
         if self._platform == "linkedin":
             return link
         link = self._platform_base_link + link
         return link
 
-    def _get_link_job(self, link, xpath, need_result_link):
-        soup = self._instance_url(link, need_result_link)
+    def _get_link_job(self, link: str, xpath: str, need_result_link: bool) -> str | None:
+        soup: BeautifulSoup = self._instance_url(link, need_result_link)
         raw_value: list = []
-        tree = etree.HTML(str(soup))
-        select = tree.xpath(xpath)
+        tree: lxml.etree._Element = etree.HTML(str(soup))
+        if tree is None:
+            return
+        select: list | None = tree.xpath(xpath)
         for i in select:
             raw_value.append(i.text)
-        cleaned_value = raw_value[0].strip()
+        cleaned_value: str = raw_value[0].strip()
         return cleaned_value
 
-    def _custom_result(self, link) -> dict:
+    def _custom_result(self, link: str) -> dict:
         object_custom: dict = {}
         for i in dir(self):
             if "_xpath_" in i and getattr(self, i) is not None:
                 title: str = i.replace("_xpath_", "")
-                object_custom[title] = self._get_link_job(link, getattr(self, i), True)
+                value = self._get_link_job(link, getattr(self, i), True)
+                if value is not None:
+                    object_custom[title] = value
         return object_custom
 
-    def _extract_data(self, xpath_tag, xpath_link) -> dict:
+    def _extract_data(self, xpath_tag: str, xpath_link: str) -> dict:
         title: list = []
-        tree = etree.HTML(str(self.soup))
-        select = tree.xpath(xpath_tag)
-        link = self._extract_link(xpath_link)
+        tree: lxml.etree._Element = etree.HTML(str(self.soup))
+        select: list = tree.xpath(xpath_tag)
+        link: str = self._extract_link(xpath_link)
         for i in select:
             title.append(i.text)
-        clean_title = title[0].strip()
+        clean_title: str = title[0].strip()
         additional_info: dict = self._custom_result(link)
         job: dict = {
             "job": clean_title,
