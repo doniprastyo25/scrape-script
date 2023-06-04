@@ -11,7 +11,8 @@ class ScrapeBs4:
         self._xpath_type = '//*[@id="main-content"]/section[1]/div/div/section[1]/div/ul/li[2]/span'
         self._xpath_job_function = '//*[@id="main-content"]/section[1]/div/div/section[1]/div/ul/li[3]/span'
         self._xpath_industries = '//*[@id="main-content"]/section[1]/div/div/section[1]/div/ul/li[4]/span'
-        self.base_url = "https://www.linkedin.com/jobs/search?keywords=Node.js&location=Indonesia&geoId=102478259&trk=public_jobs_jobs-search-bar_search-submit&position=1&pageNum=0"
+        self._xpath_posted = '//*[@id="main-content"]/section[1]/div/section[2]/div/div[1]/div/h4/div[2]/span[1]'
+        self.base_url = "https://www.linkedin.com/jobs/search?keywords=Django&location=Indonesia&locationId=&geoId=102478259&f_TPR=&position=1&pageNum=0"
         self.exec_script()
     
     def _instance_url(self, url):
@@ -36,6 +37,7 @@ class ScrapeBs4:
             "job_role": self._get_link_job(link, self._xpath_job_function),
             "contract": self._get_link_job(link, self._xpath_type),
             "industries": self._get_link_job(link, self._xpath_industries),
+            "posted": self._get_link_job(link, self._xpath_posted),
             "link": link,
         }
         return job
@@ -54,6 +56,7 @@ class ScrapeBs4:
     def exec_script(self):
         soup = self._instance_url(self.base_url)
         for i in range(1, 6):
+            print(i)
             title = self._extract_title(soup, f'//*[@id="main-content"]/section[2]/ul/li[{i}]/div/a/span', f'#main-content > section.two-pane-serp-page__results-list > ul > li:nth-child({i}) > div > a')
             print(json.dumps(title, indent=3))
 
