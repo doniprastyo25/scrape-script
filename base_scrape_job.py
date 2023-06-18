@@ -50,6 +50,8 @@ class BaseScrape(ABC):
         select: list | None = tree.xpath(xpath)
         for i in select:
             raw_value.append(i.text)
+        if len(raw_value) == 0:
+            return None
         cleaned_value: str = raw_value[0].strip()
         return cleaned_value
 
